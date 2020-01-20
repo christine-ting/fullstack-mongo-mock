@@ -19,7 +19,7 @@
     "nodemon": "^1.18.10",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "mongoose": "^4.9.6"
+    "mongoose": "^5.8.9"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",

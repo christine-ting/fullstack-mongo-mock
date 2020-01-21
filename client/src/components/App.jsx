@@ -12,27 +12,43 @@ export default class App extends React.Component {
       products: [],
       current: {},
       currentBid: 0,
-      bidChange: false
+      bidChange: false,
+      searchInput: ''
     }
     this.getProducts = this.getProducts.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.resetBidChange = this.resetBidChange.bind(this);
+    this.changeHandler = this.changeHandler.bind(this);
+    this.filterResults = this.filterResults.bind(this);
   }
 
   componentDidMount() {
     this.getProducts();
   }
 
+  filterResults(result) {
+    if (this.state.searchInput === '') {
+      this.setState({
+        products: result
+      })
+    } else {
+      var filteredResult = _.filter(result, (product) => {
+        return product.item.includes(this.state.searchInput)
+      })
+      
+      this.setState({
+        products: filteredResult
+      })
+    }
+  }
+  
   getProducts() {
     axios 
       .get('/products')
       .then((result) => 
-        this.setState({
-          products: result.data,
-        }
-      ))
+        this.filterResults(result.data)
+      )
       .catch(err => console.error(err))
-
   }
 
   clickHandler(product) {
@@ -46,6 +62,13 @@ export default class App extends React.Component {
     this.setState({ bidChange: true })
   }
 
+  changeHandler(event) {
+    this.setState({
+      searchInput: event.target.value
+    })
+    this.getProducts();
+  }
+
   render(){
     return(
       <div>
@@ -55,7 +78,7 @@ export default class App extends React.Component {
         </div>
         <nav className="navbar">
           <div className="col-md-6 offset-md-3">
-            <Search />
+            <Search changeHandler={this.changeHandler}/>
           </div>
         </nav>
         <div className="row main-container">

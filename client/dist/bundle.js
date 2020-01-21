@@ -10537,11 +10537,14 @@ var App = function (_React$Component) {
       products: [],
       current: {},
       currentBid: 0,
-      bidChange: false
+      bidChange: false,
+      searchInput: ''
     };
     _this.getProducts = _this.getProducts.bind(_this);
     _this.clickHandler = _this.clickHandler.bind(_this);
     _this.resetBidChange = _this.resetBidChange.bind(_this);
+    _this.changeHandler = _this.changeHandler.bind(_this);
+    _this.filterResults = _this.filterResults.bind(_this);
     return _this;
   }
 
@@ -10551,14 +10554,31 @@ var App = function (_React$Component) {
       this.getProducts();
     }
   }, {
-    key: 'getProducts',
-    value: function getProducts() {
+    key: 'filterResults',
+    value: function filterResults(result) {
       var _this2 = this;
 
-      _axios2.default.get('/products').then(function (result) {
-        return _this2.setState({
-          products: result.data
+      if (this.state.searchInput === '') {
+        this.setState({
+          products: result
         });
+      } else {
+        var filteredResult = _.filter(result, function (product) {
+          return product.item.includes(_this2.state.searchInput);
+        });
+
+        this.setState({
+          products: filteredResult
+        });
+      }
+    }
+  }, {
+    key: 'getProducts',
+    value: function getProducts() {
+      var _this3 = this;
+
+      _axios2.default.get('/products').then(function (result) {
+        return _this3.filterResults(result.data);
       }).catch(function (err) {
         return console.error(err);
       });
@@ -10575,6 +10595,14 @@ var App = function (_React$Component) {
     key: 'resetBidChange',
     value: function resetBidChange() {
       this.setState({ bidChange: true });
+    }
+  }, {
+    key: 'changeHandler',
+    value: function changeHandler(event) {
+      this.setState({
+        searchInput: event.target.value
+      });
+      this.getProducts();
     }
   }, {
     key: 'render',
@@ -10602,7 +10630,7 @@ var App = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'col-md-6 offset-md-3' },
-            _react2.default.createElement(_Search2.default, null)
+            _react2.default.createElement(_Search2.default, { changeHandler: this.changeHandler })
           )
         ),
         _react2.default.createElement(
@@ -11703,24 +11731,52 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(17);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Search = function Search() {
-  return _react2.default.createElement(
-    "div",
-    { className: "search-bar form-inline" },
-    _react2.default.createElement("input", { className: "form-control", type: "text" }),
-    _react2.default.createElement(
-      "button",
-      { className: "btn hidden-sm-down" },
-      _react2.default.createElement("span", { className: "glyphicon glyphicon-search" })
-    )
-  );
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Search = function (_React$Component) {
+  _inherits(Search, _React$Component);
+
+  function Search(props) {
+    _classCallCheck(this, Search);
+
+    var _this = _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).call(this, props));
+
+    _this.state = {};
+    return _this;
+  }
+
+  _createClass(Search, [{
+    key: "render",
+    value: function render() {
+      return _react2.default.createElement(
+        "div",
+        { className: "search-bar form-inline" },
+        _react2.default.createElement("input", { className: "form-control", type: "text", onChange: this.props.changeHandler }),
+        _react2.default.createElement(
+          "button",
+          { className: "btn hidden-sm-down" },
+          _react2.default.createElement("span", { className: "glyphicon glyphicon-search" })
+        )
+      );
+    }
+  }]);
+
+  return Search;
+}(_react2.default.Component);
+
+;
 
 exports.default = Search;
 
